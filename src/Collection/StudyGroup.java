@@ -46,7 +46,6 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
     }
 
     public Long getId() {
-
         return this.id;
     }
     public void setId(Long id) {this.id = id;}

@@ -1,29 +1,24 @@
 package Client;
 
-import dependencies.CommandObject;
 import dependencies.CommandObjectCreator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.PortUnreachableException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-@SuppressWarnings("FieldCanBeLocal")
+@SuppressWarnings({"FieldCanBeLocal", "ConstantConditions"})
 public class ScriptReader {
     private final CommandObjectCreator commandObjectCreator = new CommandObjectCreator();
     private ArrayList<String> rec = new ArrayList<>();
     private ArrayList<String[]> script;
-
-    private static CommandObject commandObject;
+    private ArrayList<String> scriptArgs;
 
     private final InetAddress serverAddress;
     private String scriptCommand;
-    private String scriptArgs;
 
     private final Receiver receiver;
     private final Sender sender;
@@ -60,8 +55,21 @@ public class ScriptReader {
             }
 
             for (int j = 0; j < script.size(); j++) {
+                scriptArgs = new ArrayList<>();
                 scriptCommand = script.get(j)[0];
-                scriptArgs = (script.get(j).length >= 2) ? script.get(j)[1] : null;
+                if (scriptCommand.equals("add")) {
+                    for (int i = 1; i <= 11; i++) {
+                        scriptArgs.add(script.get(j + i)[0]);
+                    }
+                    j += 11;
+                } else if (scriptCommand.equals("update")) {
+                    for (int i = 1; i <= 12; i++) {
+                        scriptArgs.add(script.get(j + i)[0]);
+                    }
+                    j += 12;
+                } else {
+                    scriptArgs.add((script.get(j).length >= 2) ? script.get(j)[1] : null);
+                }
 
                 try {
                     switch (scriptCommand) {
@@ -74,19 +82,16 @@ public class ScriptReader {
                         case "head":
                         case "history":
                         case "exit":
-                            this.sender.sendMessage(commandObjectCreator.create(scriptCommand, new ArrayList<>()), this.serverAddress);
+                            this.sender.sendMessage(commandObjectCreator.create(scriptCommand, scriptArgs), this.serverAddress);
                             break;
 
                         case "add":
-                            this.sender.sendMessage(commandObjectCreator.create(scriptCommand, new ArrayList<>(Collections.singleton(scriptArgs))), this.serverAddress);
-                            break;
-
                         case "update":
                         case "remove_by_id":
                         case "execute_script":
                         case "filter_contains_name":
                             assert scriptArgs != null;
-                            this.sender.sendMessage(commandObjectCreator.create(scriptCommand, new ArrayList<>(Collections.singleton(scriptArgs))), this.serverAddress);
+                            this.sender.sendMessage(commandObjectCreator.create(scriptCommand, scriptArgs), this.serverAddress);
                             break;
                     }
 

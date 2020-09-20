@@ -6,7 +6,6 @@ import dependencies.CommandProcessor;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings({"FieldCanBeLocal"})
 public class Client {

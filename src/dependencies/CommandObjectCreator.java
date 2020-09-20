@@ -36,18 +36,15 @@ public class CommandObjectCreator {
                 return new CommandObject(command);
 
             case "add":
-                if (commandArgs.size() > 0) {
-                    List<String> args = new ArrayList<>(Arrays.asList(commandArgs.get(0).split(" ")));
-                    int argsAmount = commandArgs.get(0).split(" ").length;
-                    if (argsAmount == 11) {
-                        commandObject = new CommandObject(command, studyGroupCreator.constructor(
-                                0L, args.get(0), args.get(1), args.get(2), args.get(3), args.get(4),
-                                args.get(5), args.get(6), args.get(7), args.get(8), args.get(9), args.get(10)
-                            )
-                        );
-                        System.out.println(commandObject);
-                        return (commandObject.getStudyGroup() != null) ? commandObject : createErrorObject(command, "Error, see errors above");
-                    }
+                System.out.println(commandArgs);
+                if (commandArgs.size() == 11) {
+                    commandObject = new CommandObject(command, studyGroupCreator.constructor(
+                            0L, commandArgs.get(0), commandArgs.get(1), commandArgs.get(2), commandArgs.get(3), commandArgs.get(4),
+                            commandArgs.get(5), commandArgs.get(6), commandArgs.get(7), commandArgs.get(8), commandArgs.get(9), commandArgs.get(10)
+                        )
+                    );
+                    System.out.println(commandObject);
+                    return (commandObject.getStudyGroup() != null) ? commandObject : createErrorObject(command, "Error, see errors above");
                 }
                 return new CommandObject(command, studyGroupCreator.constructor(0L));
 
@@ -69,20 +66,18 @@ public class CommandObjectCreator {
                             return new CommandObject(command, commandArgs.get(0));
 
                         case "update":
-                            List<String> args = new ArrayList<>(Arrays.asList(commandArgs.get(0).split(" ")));
-                            int argsAmount = commandArgs.get(0).split(" ").length;
-                            groupID = toLong(args.get(0));
+                            groupID = toLong(commandArgs.get(0));
                             if (groupID >= 0) {
-                                if (argsAmount == 12) {
+                                if (commandArgs.size() == 12) {
                                     return new CommandObject(command, studyGroupCreator.constructor(
-                                            groupID, args.get(1), args.get(2), args.get(3), args.get(4), args.get(5),
-                                            args.get(6), args.get(7), args.get(8), args.get(9), args.get(10), args.get(11)
+                                            groupID, commandArgs.get(1), commandArgs.get(2), commandArgs.get(3), commandArgs.get(4), commandArgs.get(5),
+                                            commandArgs.get(6), commandArgs.get(7), commandArgs.get(8), commandArgs.get(9), commandArgs.get(10), commandArgs.get(11)
                                     )
                                     );
                                 }
                                 return new CommandObject(command, studyGroupCreator.constructor(0L));
                             } else {
-                                return createErrorObject(command, String.format("groupID must be a long, got '%s'", args.get(0)));
+                                return createErrorObject(command, String.format("groupID must be a long, got '%s'", commandArgs.get(0)));
                             }
 
                         case "remove_by_id":
