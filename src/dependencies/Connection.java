@@ -1,4 +1,4 @@
-package Common;
+package dependencies;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

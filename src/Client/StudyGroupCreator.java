@@ -1,12 +1,14 @@
 package Client;
 
 import Collection.*;
+import com.sun.tools.corba.se.idl.StringGen;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+@SuppressWarnings("DuplicatedCode")
 public class StudyGroupCreator {
     public StudyGroup constructor(Long id) {
         while (true) {
@@ -69,7 +71,7 @@ public class StudyGroupCreator {
                         } else flag = false;
                     }
                 }
-                Long y = Long.parseLong(yString);
+                int y = Integer.parseInt(yString);
                 System.out.println("Input amount of expelled students:");
                 String expelledStudentsString = field.nextLine();
                 flag = true;
@@ -214,155 +216,144 @@ public class StudyGroupCreator {
         return false;
     }
 
-    public StudyGroup constructor(int j, ArrayList<String[]> script) throws InputMismatchException{
-        StudyGroup studyGroup = null;
-        try {
-            String studentsCountString = script.get(j + 1)[0];
+    public StudyGroup constructor(Long id, String groupName, String groupCurrentSemester, String xCoordinate, String yCoordinate, String studentsAmount, String adminName,
+                                  String adminHeight, String adminWeight, String adminNation, String studentsToExpelAmount, String expelledStudentsAmount) {
+        boolean errorFlag = false;
+        
+        Coordinates coordinates = null;
+        Country adminNationality = null;
+        float adminHeightFloat = 0;
+        int shouldBeExpelled = 0;
+        int expelledStudents = 0;
+        int adminWeightFloat = 0;
+        long studentsCount = 0L;
+        Person groupAdmin = null;
+        Semester semester = null;
+        int x = 0;
+        int y = 0;
 
-            if (studentsCountString.trim().length() == 0) {
-                throw new InputMismatchException();
-            }
-
-            if (!isDigit(studentsCountString)) {
-                System.out.println("! students count must be number !");
-                throw new InputMismatchException();
-            } else if (Long.parseLong(studentsCountString) <= 0) {
-                System.out.println("! students count must be > 0 !");
-                throw new InputMismatchException();
-            }
-
-            Long studentsCount = Long.parseLong(studentsCountString);
-            String name = script.get(j + 2)[0];
-
-            if (name.trim().length() == 0) {
-                System.out.println("! Empty string entered !");
-                throw new InputMismatchException();
-            }
-
-            String xString = script.get(j + 3)[0];
-
-            if (xString.trim().length()==0) {
-                throw new InputMismatchException();
-            }
-
-            if (!isDigit(xString)){
-                System.out.println("! x must be number !");
-                throw new InputMismatchException();
-            } else if (Integer.parseInt(xString) <= -18){
-                System.out.println("! x must be > -18 !");
-                throw new InputMismatchException();
-            }
-
-            Integer x = Integer.parseInt(xString);
-            String yString = script.get(j + 4)[0];
-
-            if (yString.trim().length()==0) {
-                throw new InputMismatchException();
-            }
-
-            if (!isDigit(yString)){
-                System.out.println("! y must be number !");
-                throw new InputMismatchException();
-            } else if (Long.parseLong(yString)>950){
-                System.out.println("! y must be <= 950 !");
-                throw new InputMismatchException();
-            }
-
-            Long y = Long.parseLong(yString);
-            String expelledString = script.get(j + 5)[0];
-
-            if (expelledString.trim().length()==0) {
-                throw new InputMismatchException();
-            }
-
-            if (!isDigit(expelledString)){
-                System.out.println("! count of expelled students must be number");
-                throw new InputMismatchException();
-            } else if (Integer.parseInt(expelledString)<=0){
-                System.out.println("! Count of expelled students must be > 0");
-                throw new InputMismatchException();
-            }
-
-            Integer expelledStudents = Integer.parseInt(expelledString);
-            String shouldString = script.get(j + 6)[0];
-
-            if (shouldString.trim().length()==0) {
-                throw new InputMismatchException();
-            }
-
-            if (!isDigit(shouldString)) {
-                System.out.println("! Count of should be expelled students must be a number !");
-                throw new InputMismatchException();
-            } else if (Integer.parseInt(shouldString)<=0){
-                System.out.println("! Count of should be expelled students must be > 0 !");
-            }
-
-            Integer shouldBeExpelled = Integer.parseInt(shouldString);
-            String semString = script.get(j + 7)[0];
-
-            if (semString.trim().length()==0) {
-                throw new InputMismatchException();
-            } else if (!containsSemester(semString)) {
-                System.out.println("! Wrong semester !");
-                throw new InputMismatchException();
-            }
-
-            Semester semester = Semester.valueOf(semString);
-            String nameGroupAdmin = script.get(j + 8)[0];
-
-            if (nameGroupAdmin.trim().length() == 0) {
-                throw new InputMismatchException();
-            }
-
-            String heightString = script.get(j + 9)[0];
-
-            if (heightString.trim().length() == 0) {
-                throw new InputMismatchException();
-            }
-
-            if (!isDigitFloat(heightString)){
-                System.out.println("! height must be a number !");
-                throw new InputMismatchException();
-            } else if (Float.parseFloat(heightString) <= 0){
-                System.out.println("! height must be > 0 !");
-            }
-
-            float height = Float.parseFloat(heightString);
-            String weightString = script.get(j + 10)[0];
-
-            if (weightString.trim().length() == 0) {
-                throw new InputMismatchException();
-            } else if (!isDigit(weightString)) {
-                System.out.println("! weight must be a number !");
-                throw new InputMismatchException();
-            } else if (Integer.parseInt(weightString) <= 0){
-                System.out.println("! weight must be > 0 !");
-                throw new InputMismatchException();
-            }
-
-            int weight = Integer.parseInt(weightString);
-            String country = script.get(j + 11)[0];
-
-            if (country.trim().length()==0) {
-                throw new InputMismatchException();
-            } else if (!containsCountry(country)){
-                System.out.println("! Wrong country in file !");
-                throw new InputMismatchException();
-            }
-
-            Country nationality = Country.valueOf(country);
-            Coordinates coordinates = new Coordinates(x, y);
-            Person groupAdmin = new Person(nameGroupAdmin, height, weight, nationality);
-
-            if (script.get(j)[0].equals("update")) {
-                studyGroup = new StudyGroup(name, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
-                studyGroup.setId(Long.valueOf(script.get(j)[1]));
+        if (!isDigit(studentsAmount)) {
+            System.out.printf("\t[ScriptExecutorError] Students amount must be a number, got '%s'\n", studentsAmount);
+            errorFlag = true;
+        } else {
+            if (Long.parseLong(studentsAmount) <= 0) {
+                System.out.printf("\t[ScriptExecutorError] Students amount must be > 0, got '%s'\n", studentsAmount);
+                errorFlag = true;
             } else {
-                studyGroup = new StudyGroup(name, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
+                studentsCount = Long.parseLong(studentsAmount);
             }
-        } catch (InputMismatchException e){
-            System.out.println("! Empty field in file !");
         }
-        return studyGroup;
+
+        if (!isDigit(xCoordinate)) {
+            System.out.printf("\t[ScriptExecutorError] xCoordinate must be a number, got '%s'\n", xCoordinate);
+            errorFlag = true;
+        } else {
+            if (Integer.parseInt(xCoordinate) <= -18) {
+                System.out.printf("\t[ScriptExecutorError] xCoordinate must be > -18, got '%s'\n", xCoordinate);
+                errorFlag = true;
+            } else {
+                x = Integer.parseInt(xCoordinate);
+            }
+        }
+
+        if (!isDigit(yCoordinate)){
+            System.out.printf("\t[ScriptExecutorError] yCoordinate must be a number, got '%s'\n", yCoordinate);
+            errorFlag = true;
+        } else{
+            if (Long.parseLong(yCoordinate) > 950){
+                System.out.printf("\t[ScriptExecutorError] yCoordinate must be <= 950, got '%s'\n", yCoordinate);
+                errorFlag = true;
+            } else {
+                y = Integer.parseInt(yCoordinate);
+            }
+        }
+
+        if (expelledStudentsAmount.trim().length() == 0) {
+            throw new InputMismatchException();
+        }
+
+        if (!isDigit(expelledStudentsAmount)){
+            System.out.printf("\t[ScriptExecutorError] Students amount must be a number, got '%s'\n", expelledStudentsAmount);
+            errorFlag = true;
+        } else{
+            if (Integer.parseInt(expelledStudentsAmount)<=0){
+                System.out.printf("\t[ScriptExecutorError] Students amount must be > 0, got '%s'\n", expelledStudentsAmount);
+                errorFlag = true;
+            } else {
+                expelledStudents = Integer.parseInt(expelledStudentsAmount);
+            }
+        }
+
+        if (!isDigit(studentsToExpelAmount)){
+            System.out.printf("\t[ScriptExecutorError] Students amount must be a number, got '%s'\n", studentsToExpelAmount);
+            errorFlag = true;
+        } else {
+            if (Integer.parseInt(studentsToExpelAmount) <= 0){
+                System.out.printf("\t[ScriptExecutorError] Students amount must be > 0, got '%s'\n", studentsToExpelAmount);
+                errorFlag = true;
+            } else {
+                shouldBeExpelled = Integer.parseInt(studentsToExpelAmount);
+            }
+        }
+
+        if (!containsSemester(groupCurrentSemester)){
+            System.out.printf("\t[ScriptExecutorError] Semester must be one of this values: [FIRST, SECOND, FOURTH, FIFTH, EIGHTH], got '%s'\n", groupCurrentSemester);
+            errorFlag = true;
+        } else {
+            semester = Semester.valueOf(groupCurrentSemester);
+        }
+
+        if (adminName.trim().length() == 0){
+            System.out.printf("\t[ScriptExecutorError] Admin name cannot be empty, got '%s'\n", adminName);
+            throw new InputMismatchException();
+        }
+
+            if (!isDigitFloat(adminHeight)){
+                System.out.printf("\t[ScriptExecutorError] Admin height must be a number, got '%s'\n", adminHeight);
+                errorFlag = true;
+            } else{
+                if (Float.parseFloat(adminHeight) <= 0){
+                    System.out.printf("\t[ScriptExecutorError] Admin height must be > 0, got '%s'\n", adminHeight);
+                    errorFlag = true;
+                } else {
+                    adminHeightFloat = Float.parseFloat(adminHeight);
+                }
+            }
+
+        if (adminWeight.trim().length() == 0) {
+            throw new InputMismatchException();
+        }
+        if (!isDigit(adminWeight)){
+            System.out.printf("\t[ScriptExecutorError] Admin weight must be a number, got '%s'\n", adminWeight);
+            errorFlag = true;
+        } else if (Integer.parseInt(adminWeight) <= 0){
+            System.out.printf("\t[ScriptExecutorError] Admin weight must be > 0, got '%s'\n", adminWeight);
+            errorFlag = true;
+        } else {
+            adminWeightFloat = Integer.parseInt(adminWeight);
+        }
+
+
+        if (!containsCountry(adminNation)){
+            System.out.printf("[ScriptExecutorError] Country must be one of this values: [GERMANY, FRANCE, INDIA, VATICAN, SOUTH_KOREA], got '%s'\n", adminNation);
+            errorFlag = true;
+        } else {
+            adminNationality = Country.valueOf(adminNation);
+        }
+
+        if (!errorFlag) {
+            coordinates = new Coordinates(x, y);
+            groupAdmin = new Person(adminName, adminHeightFloat, adminWeightFloat, adminNationality);
+
+            if (id != 0) {
+                StudyGroup studyGroup = new StudyGroup(groupName, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
+                studyGroup.setId(id);
+                return studyGroup;
+            } else {
+                return new StudyGroup(groupName, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
+            }
+        } else {
+            return null;
+        }
     }
 }

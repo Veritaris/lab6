@@ -3,22 +3,30 @@ package Collection;
 import java.io.Serializable;
 
 public class Person implements Serializable {
-    private String name;
-    private float height;
-    private int weight;
-    private Country nationality;
+    private final Country nationality;
+    private final double height;
+    private final String name;
+    private final int weight;
 
-    public Person (String name, float height, int weight, Country nationality){
+    public Person (String name, double height, int weight, Country nationality){
         this.name = name;
-        this.height = height;
+        this.height = Math.round(height * 10) / 10.0;
         this.weight = weight;
         this.nationality = nationality;
     }
 
     public String getName() { return name; }
-    public float getHeight() { return height; }
+    public double getHeight() { return height; }
     public int getWeight() { return weight; }
     public Country getNationality() { return nationality; }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Person<name='%s', height='%s', weight='%s', nationality='%s'>",
+                this.getName(), this.getHeight(), this.getWeight(), this.getNationality()
+                );
+    }
 
     @Override
     public boolean equals(Object object) {

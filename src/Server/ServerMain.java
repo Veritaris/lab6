@@ -6,7 +6,7 @@ public class ServerMain {
     public static Server server;
 
     public static void main(String[] args) throws IOException {
-        server = new Server("localhost", 1488);
+        server = new Server("127.0.0.1", 4200);
         server.startListening();
     }
 }

@@ -3,14 +3,14 @@ package Collection;
 import java.io.Serializable;
 
 public class Coordinates implements Serializable {
-    private Integer x;
-    private Long y;
+    private long x;
+    private long y;
 
-    public Coordinates (Integer x, Long y){
+    public Coordinates (long x, long y){
         this.x = x;
         this.y = y;
     }
 
-    public Integer getX() { return x;}
-    public Long getY() { return y;}
+    public long getX() { return x;}
+    public long getY() { return y;}
 }

@@ -1,57 +1,75 @@
 package Client;
 
+import dependencies.CommandObject;
+import dependencies.CommandProcessor;
+
 import java.io.IOException;
-import java.net.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
-import java.sql.Connection;
-import java.util.Scanner;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.concurrent.ThreadLocalRandom;
 
+@SuppressWarnings({"FieldCanBeLocal"})
 public class Client {
-    public String serverHost;
-    public int serverPort;
+    private final InetAddress serverAddress;
+    private final DatagramSocket socket;
+    private final String serverHost;
+    private final int serverPort;
 
-    public DatagramSocket datagramSocket;
-    public DatagramPacket datagramPacket;
-    public SocketAddress serverAddress;
-    public Connection connection;
-    public DatagramChannel client;
-    public String line;
+    private final Receiver messageReceiver;
+    private CommandObject receivedMessage;
+    private final Sender messageSender;
 
     private final CommandProcessor commandProcessor = new CommandProcessor();
-    private final Scanner consoleScanner = new Scanner(System.in);
-    public ByteBuffer buffer = ByteBuffer.allocate(32768);
+    private final ScriptReader scriptReader;
+    private CommandObject commandObject;
 
     public Client(String host, int port) throws IOException {
         System.out.printf("Creating client at '%s:%s'\n", host, port);
         this.serverHost = host;
         this.serverPort = port;
-        this.serverAddress = new InetSocketAddress(this.serverHost, this.serverPort);;
-        this.client = DatagramChannel.open();
-        this.datagramSocket = new DatagramSocket();
+
+        this.serverAddress = InetAddress.getByName(this.serverHost);
+        this.socket = new DatagramSocket();
+
+        this.messageSender = new Sender(this.socket, this.serverPort);
+        this.messageReceiver = new Receiver(this.socket, this.serverAddress, this.serverPort);
+
+        this.scriptReader = new ScriptReader(this.messageReceiver, this.messageSender, this.serverAddress);
+        this.commandProcessor.setScriptReader(this.scriptReader);
+
         System.out.println("Client created");
     }
 
-    public void connectToServer() {
-
-    }
-
-    public void sendMessage(String message) {
-        byte[] payload = message.getBytes();
-        try {
-            datagramPacket = new DatagramPacket(payload, payload.length, InetAddress.getByName(this.serverHost), this.serverPort);
-            this.datagramSocket.send(datagramPacket);
-        } catch (IOException e) {
-            System.out.printf("Something wrong with given message: %s\n", message);
-        }
-    }
-
-    public void startInteractiveMode() {
+    public void startInteractiveMode() throws IOException, ClassNotFoundException {
         System.out.println("You have entered into interactive mode");
 
         while (true) {
-            line = consoleScanner.nextLine();
-            sendMessage(line);
+            commandObject = commandProcessor.readCommand();
+
+            if (!commandObject.isFailed()) {
+                if (commandObject.isScripted()) {
+                    continue;
+                }
+
+                messageSender.sendMessage(commandObject, this.serverAddress);
+                receivedMessage = messageReceiver.handleMessage();
+
+                if (!receivedMessage.isFailed()) {
+                    for (String line : receivedMessage.getMessage()) {
+                        System.out.println(line);
+                    }
+                }
+
+                if (receivedMessage.getName().equals("exit")) {
+                    this.commandProcessor.close();
+                    System.exit(0);
+                }
+            } else {
+                System.out.printf(
+                        "Command object was not created, reason:\n\t%s\n",
+                        commandObject.getFailReason()
+                );
+            }
         }
     }
 }

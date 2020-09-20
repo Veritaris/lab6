@@ -10,6 +10,12 @@ public enum Country implements Serializable {
     SOUTH_KOREA("South Korea");
 
     public String tittle;
-    Country(String tittle) { this.tittle = tittle; }
-    public String getTittle() { return tittle; }
+
+    Country(String tittle) {
+        this.tittle = tittle;
+    }
+
+    public String getTittle() {
+        return tittle;
+    }
 }
