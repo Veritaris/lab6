@@ -27,3 +27,4 @@ INDIA
 2
 4
 show
+execute_script test_script2.txt

@@ -31,7 +31,7 @@ public class Receiver {
 
     public CommandObject handleMessage() throws IOException, ClassNotFoundException {
         try {
-            this.socket.setSoTimeout(15000);
+            this.socket.setSoTimeout(5000);
             packet = new DatagramPacket(message, message.length, this.serverAddress, this.serverPort);
             this.socket.receive(packet);
             bais = new ByteArrayInputStream(message);
@@ -39,7 +39,6 @@ public class Receiver {
             receivedCommandObject = (CommandObject) ois.readObject();
             return receivedCommandObject;
         } catch (SocketTimeoutException ignored) {
-            System.out.println("Server is not available now, please, try later");
             return CommandObjectCreator.createErrorObject("error", "Server not responding");
         }
     }

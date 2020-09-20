@@ -16,6 +16,8 @@ public class ScriptReader {
     private ArrayList<String> rec = new ArrayList<>();
     private ArrayList<String[]> script;
     private ArrayList<String> scriptArgs;
+    private String scriptName = "";
+    private boolean scriptIsRecursive = false;
 
     private final InetAddress serverAddress;
     private String scriptCommand;
@@ -34,16 +36,14 @@ public class ScriptReader {
     public void executeScript(String file_path) {
         File file = new File(file_path);
         try {
-            for (String str : rec) {
-                if (file.getName().equals(str)) {
-                    throw new InputMismatchException();
-                }
+            if (this.scriptName.equals(file.getName())) {
+                throw new InputMismatchException();
             }
         } catch (InputMismatchException e) {
             System.out.println("Recursion cannot work with the same file!");
             return;
         }
-
+        this.scriptName = file.getName();
         rec.add(file.getName());
 
         try {
@@ -88,15 +88,21 @@ public class ScriptReader {
                         case "add":
                         case "update":
                         case "remove_by_id":
-                        case "execute_script":
                         case "filter_contains_name":
                             assert scriptArgs != null;
                             this.sender.sendMessage(commandObjectCreator.create(scriptCommand, scriptArgs), this.serverAddress);
                             break;
+
+                        case "execute_script":
+                            this.scriptIsRecursive = true;
+                            executeScript(scriptArgs.get(0));
                     }
 
-                    for (String line : this.receiver.handleMessage().getMessage()) {
-                        System.out.println(line);
+                    try {
+                        for (String line : this.receiver.handleMessage().getMessage()) {
+                            System.out.println(line);
+                        }
+                    } catch (NullPointerException ignored) {
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
