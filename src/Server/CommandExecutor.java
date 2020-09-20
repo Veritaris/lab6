@@ -6,13 +6,15 @@ import java.util.*;
 import java.io.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.parser.*;
 import org.json.simple.*;
 import Collection.*;
 
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal", "Convert2MethodRef", "unchecked"})
 public class CommandExecutor {
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CommandExecutor.class.getName());
+    private static final Logger logger = LogManager.getLogger();
 
     private PriorityQueue<StudyGroup> groups = new PriorityQueue<>();
     private String[][] availableCommands = new String[16][1];
@@ -53,7 +55,7 @@ public class CommandExecutor {
                 throw new FileNotFoundException();
             }
         } catch (FileNotFoundException e) {
-            logger.severe("File not found (environment variable is empty!)");
+            logger.error("File not found (environment variable is empty!)");
             System.exit(1);
         }
         this.collectionsJSONFilePath = collectionsJSONFilePath;
@@ -66,7 +68,7 @@ public class CommandExecutor {
                 throw new FileNotFoundException();
             }
         } catch (FileNotFoundException e) {
-            logger.severe("File  not found!");
+            logger.error("File  not found!");
             System.exit(1);
         }
 
@@ -87,12 +89,12 @@ public class CommandExecutor {
                 throw new SecurityException();
             }
         } catch (SecurityException e) {
-            logger.severe("File access denied");
+            logger.error("File access denied");
             System.exit(1);
         }
 
         if (collectionsJSONFile.length() == 0) {
-            logger.severe("File is empty");
+            logger.error("File is empty");
             return;
         }
 
@@ -109,19 +111,19 @@ public class CommandExecutor {
             }
 
         } catch (FileNotFoundException e) {
-            logger.severe("!File not found!");
+            logger.error("!File not found!");
             System.exit(1);
 
         } catch (NumberFormatException e) {
-            logger.severe("!Invalid argument format in file!");
+            logger.error("!Invalid argument format in file!");
             System.exit(1);
 
         } catch (IllegalArgumentException e) {
-            logger.severe("!Invalid string argument in file!");
+            logger.error("!Invalid string argument in file!");
             System.exit(1);
 
         } catch (IOException e){
-            logger.severe("!Input error!");
+            logger.error("!Input error!");
             System.exit(1);
 
         } catch (ParseException e) {
@@ -141,7 +143,7 @@ public class CommandExecutor {
                 i++;
             }
         } catch (FileNotFoundException e) {
-            logger.severe("File with commands not found!");
+            logger.error("File with commands not found!");
             System.exit(1);
         }
     }
@@ -296,9 +298,9 @@ public class CommandExecutor {
             fileWriter.flush();
 
         } catch (FileNotFoundException e){
-            logger.severe("File not found");
+            logger.error("File not found");
         } catch (IOException e) {
-            logger.severe("Output error");
+            logger.error("Output error");
         }
         logger.info("Collection saved.");
     }

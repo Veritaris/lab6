@@ -1,6 +1,8 @@
 package Server;
 
 import dependencies.CommandObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.nio.channels.DatagramChannel;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Sender {
+    private static final Logger logger = LogManager.getLogger();
     private final DatagramChannel datagramChannel;
     private ByteArrayOutputStream baos;
     private ObjectOutputStream oos;
@@ -28,6 +31,7 @@ public class Sender {
         baos.flush();
         try {
             this.datagramChannel.send(ByteBuffer.wrap(payload), address);
+            logger.info(String.format("Sending response to %s: %s", address, commandObject));
         } catch (IOException e) {
             System.out.printf("Something wrong with given message: %s\n", commandObject.toString());
         }

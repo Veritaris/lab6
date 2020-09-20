@@ -1,6 +1,8 @@
 package Server;
 
 import dependencies.CommandObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.nio.channels.DatagramChannel;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Receiver {
+    private static final Logger logger = LogManager.getLogger();
     private CommandObject receivedCommandObject;
     private final DatagramChannel datagramChannel;
     private SocketAddress clientAddress;
@@ -34,6 +37,7 @@ public class Receiver {
             ois = new ObjectInputStream(bais);
             receivedCommandObject = (CommandObject) ois.readObject();
             buffer.clear();
+            logger.info(String.format("Received packet: ip %s, message %s", this.getClientAddress(), receivedCommandObject.toString()));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

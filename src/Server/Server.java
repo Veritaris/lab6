@@ -4,6 +4,9 @@ import java.nio.channels.DatagramChannel;
 
 import dependencies.CommandProcessor;
 import dependencies.CommandObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.net.InetSocketAddress;
 import java.net.DatagramSocket;
 import java.net.SocketAddress;
@@ -12,9 +15,7 @@ import java.nio.file.Paths;
 
 @SuppressWarnings({"InfiniteLoopStatement", "FieldCanBeLocal"})
 public class Server {
-//    private static final Logger logger = LogManager.getLogger("ConsoleAppender");
-//    private static final Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
-    public static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Server.class.getName());
+    private static final Logger logger = LogManager.getLogger();
 
     public String host;
     public int port;
@@ -32,7 +33,6 @@ public class Server {
     private final CommandProcessor commandProcessor = new CommandProcessor();
 
     public Server(String host, int port) throws IOException {
-        System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] [%4$s] %5$s %n");
         logger.info(String.format("Creating server at '%s:%s'...", host, port));
 
         this.host = host;
@@ -59,10 +59,8 @@ public class Server {
             receivedCommandObject = null;
             receivedCommandObject = this.messageReceiver.handleMessage();
 
-            logger.info(String.format("Received packet: ip %s, message %s", this.messageReceiver.getClientAddress(), receivedCommandObject.toString()));
-
             commandObjectToSend = commandProcessor.processCommand(receivedCommandObject);
-            logger.info(String.format("Sending response to %s: %s", this.messageReceiver.getClientAddress(), commandObjectToSend));
+
             this.messageSender.sendMessage(commandObjectToSend, this.messageReceiver.getClientAddress());
         }
     }
