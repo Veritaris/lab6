@@ -15,9 +15,9 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
     private Integer toExpelAmount;
     private Semester semester;
     private Person groupAdmin;
-    private Random random = new Random();
 
-    public StudyGroup (String name, Semester semester, Coordinates coordinates, Long studentsCount, Person groupAdmin, Integer toExpelAmount, Integer expelledStudentsAmount){
+    public StudyGroup (Long groupID, String name, Semester semester, Coordinates coordinates, Long studentsCount, Person groupAdmin, Integer toExpelAmount, Integer expelledStudentsAmount){
+        this.id = groupID;
         this.name = name;
         this.semester = semester;
         this.coordinates = coordinates;
@@ -26,28 +26,26 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
         this.toExpelAmount = toExpelAmount;
         this.expelledStudentsAmount = expelledStudentsAmount;
         creationDate = LocalDateTime.now();
-        id = nextLong(random, 9223372036854775807L);
 
     }
 
     @Override
     public int compareTo(StudyGroup studyGroup) {
-        int result = this.name.compareTo(studyGroup.name);
-        if (result == 0){
-            if (this.studentsCount - studyGroup.studentsCount > 0) {
-                return 1;
-            } else if (this.studentsCount - studyGroup.studentsCount < 0) {
-                return -1;
-            } else {
-                return 0;
-            }
-        }
-        else return result;
+        return Long.compare(this.id, studyGroup.id);
+//        int result = this.name.compareTo(studyGroup.name);
+//        if (result == 0){
+//            if (this.studentsCount - studyGroup.studentsCount > 0) {
+//                return 1;
+//            } else if (this.studentsCount - studyGroup.studentsCount < 0) {
+//                return -1;
+//            } else {
+//                return 0;
+//            }
+//        }
+//        else return result;
     }
 
-    public Long getId() {
-        return this.id;
-    }
+    public Long getId() { return this.id; }
     public void setId(Long id) {this.id = id;}
     public String getName() {return this.name;}
     public Coordinates getCoordinates() {return this.coordinates;}

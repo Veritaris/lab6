@@ -12,7 +12,7 @@ import org.json.simple.parser.*;
 import org.json.simple.*;
 import Collection.*;
 
-@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal", "Convert2MethodRef", "unchecked"})
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal", "Convert2MethodRef", "unchecked", "SimplifyStreamApiCallChains"})
 public class CommandExecutor {
     private static final Logger logger = LogManager.getLogger();
 
@@ -43,7 +43,9 @@ public class CommandExecutor {
     private double adminHeight;
     private Person groupAdmin;
     private JSONObject admin;
+    private long lastGroupID;
     private int adminWeight;
+    private long groupID;
     private long xCord;
     private long yCord;
 
@@ -102,6 +104,7 @@ public class CommandExecutor {
 
         try (FileReader fileReader = new FileReader((this.collectionsJSONFilePath))){
             jsonArray = (JSONArray) parser.parse(fileReader);
+
             for (Object obj : jsonArray) {
                 groupJSONObject = (JSONObject) obj;
 
@@ -109,6 +112,7 @@ public class CommandExecutor {
                     this.groups.add(constructStudyGroup(groupJSONObject));
                 }
             }
+            lastGroupID = (groups.size() > 1) ? groups.peek().getId() : 1;
 
         } catch (FileNotFoundException e) {
             logger.error("!File not found!");
@@ -156,6 +160,7 @@ public class CommandExecutor {
         studentsCount = (Long) groupJSONObject.get("studentsCount");
         groupIdentifier = (String) groupJSONObject.get("name");
         admin = (JSONObject) groupJSONObject.get("admin");
+        groupID = (Long) groupJSONObject.get("id");
 
         xCord = (long) coordinatesJson.get("x");
         yCord = (long) coordinatesJson.get("y");
@@ -170,7 +175,7 @@ public class CommandExecutor {
 
         groupAdmin = new Person(groupAdminName, adminHeight, adminWeight, adminNationality);
 
-        return new StudyGroup(groupIdentifier, groupCurrentSemester, groupCoordinates, studentsCount, groupAdmin, studentsToExpelAmount, expelledStudentsAmount);
+        return new StudyGroup(groupID, groupIdentifier, groupCurrentSemester, groupCoordinates, studentsCount, groupAdmin, studentsToExpelAmount, expelledStudentsAmount);
     }
 
     public void clearMessage() {
@@ -208,6 +213,7 @@ public class CommandExecutor {
     }
 
     public ArrayList<String> add(StudyGroup studyGroup) {
+        studyGroup.setId(this.lastGroupID++);
         groups.add(studyGroup);
         sortGroups();
         message.add("Element added.");
@@ -269,6 +275,8 @@ public class CommandExecutor {
                 JSONObject group = new JSONObject();
                 JSONObject coordinatesCollections = new JSONObject();
                 JSONObject adminCollection = new JSONObject();
+
+                group.put("id", studyGroup.getId());
 
                 group.put("studentsCount", studyGroup.getStudentsCount());
                 group.put("name", studyGroup.getName());

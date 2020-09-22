@@ -47,6 +47,7 @@ public class Client {
 
             if (!commandObject.isFailed()) {
                 if (commandObject.isScripted()) {
+                    this.scriptReader.clearScriptStack();
                     continue;
                 }
 

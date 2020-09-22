@@ -1,14 +1,12 @@
 package Client;
 
 import Collection.*;
-import com.sun.tools.corba.se.idl.StringGen;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-@SuppressWarnings("DuplicatedCode")
+@SuppressWarnings({"DuplicatedCode", "BooleanMethodIsAlwaysInverted"})
 public class StudyGroupCreator {
     public StudyGroup constructor(Long id) {
         while (true) {
@@ -55,7 +53,7 @@ public class StudyGroupCreator {
                     }
                 }
                 flag = true;
-                Integer x = Integer.parseInt(xString);
+                int x = Integer.parseInt(xString);
                 System.out.println("Input y coordinate:");
                 String yString = field.nextLine();
 
@@ -164,11 +162,11 @@ public class StudyGroupCreator {
                 Country nationality = Country.valueOf(country);
                 Coordinates coordinates = new Coordinates(x, y);
                 Person groupAdmin = new Person(nameGroupAdmin, height, weight, nationality);
-                if (id!=0){
-                    StudyGroup studyGroup = new StudyGroup(name, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
-                    studyGroup.setId(id);
-                    return studyGroup;
-                } else return new StudyGroup(name, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
+                if (id != 0){
+                    return new StudyGroup(id, name, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
+                } else {
+                    return new StudyGroup(id, name, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
+                }
             } catch  (InputMismatchException e){
                 System.out.println("! Input error !");
             }catch (IllegalArgumentException e){
@@ -176,6 +174,7 @@ public class StudyGroupCreator {
             }
         }
     }
+
     private boolean isDigit(String s) throws NumberFormatException{
         try{
             Long.parseLong(s);
@@ -220,15 +219,15 @@ public class StudyGroupCreator {
                                   String adminHeight, String adminWeight, String adminNation, String studentsToExpelAmount, String expelledStudentsAmount) {
         boolean errorFlag = false;
         
-        Coordinates coordinates = null;
         Country adminNationality = null;
+        Coordinates coordinates;
         float adminHeightFloat = 0;
         int shouldBeExpelled = 0;
         int expelledStudents = 0;
         int adminWeightFloat = 0;
         long studentsCount = 0L;
-        Person groupAdmin = null;
         Semester semester = null;
+        Person groupAdmin;
         int x = 0;
         int y = 0;
 
@@ -346,11 +345,11 @@ public class StudyGroupCreator {
             groupAdmin = new Person(adminName, adminHeightFloat, adminWeightFloat, adminNationality);
 
             if (id != 0) {
-                StudyGroup studyGroup = new StudyGroup(groupName, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
+                StudyGroup studyGroup = new StudyGroup(id, groupName, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
                 studyGroup.setId(id);
                 return studyGroup;
             } else {
-                return new StudyGroup(groupName, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
+                return new StudyGroup(id, groupName, semester, coordinates, studentsCount, groupAdmin, shouldBeExpelled, expelledStudents);
             }
         } else {
             return null;

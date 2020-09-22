@@ -13,14 +13,13 @@ import java.util.Scanner;
 @SuppressWarnings({"FieldCanBeLocal", "ConstantConditions"})
 public class ScriptReader {
     private final CommandObjectCreator commandObjectCreator = new CommandObjectCreator();
-    private ArrayList<String> rec = new ArrayList<>();
-    private ArrayList<String[]> script;
-    private ArrayList<String> scriptArgs;
-    private String scriptName = "";
     private boolean scriptIsRecursive = false;
+    private ArrayList<String[]> commandWithArgs;
+    private ArrayList<String> commandArgs;
+    private ArrayList<String> scriptNameStack = new ArrayList<>();
 
     private final InetAddress serverAddress;
-    private String scriptCommand;
+    private String command;
 
     private final Receiver receiver;
     private final Sender sender;
@@ -36,66 +35,76 @@ public class ScriptReader {
     public void executeScript(String file_path) {
         File file = new File(file_path);
         try {
-            if (this.scriptName.equals(file.getName())) {
+            if (this.scriptNameStack.contains(file.getName())) {
                 throw new InputMismatchException();
             }
         } catch (InputMismatchException e) {
             System.out.println("Recursion cannot work with the same file!");
             return;
         }
-        this.scriptName = file.getName();
-        rec.add(file.getName());
+        this.scriptNameStack.add(file.getName());
 
         try {
-            script = new ArrayList<>();
+            commandWithArgs = new ArrayList<>();
             in = new Scanner(new File(file_path));
 
             while (in.hasNextLine()) {
-                script.add(in.nextLine().split(" ", 2));
+                commandWithArgs.add(in.nextLine().split(" ", 2));
             }
 
-            for (int j = 0; j < script.size(); j++) {
-                scriptArgs = new ArrayList<>();
-                scriptCommand = script.get(j)[0];
-                if (scriptCommand.equals("add")) {
-                    for (int i = 1; i <= 11; i++) {
-                        scriptArgs.add(script.get(j + i)[0]);
-                    }
-                    j += 11;
-                } else if (scriptCommand.equals("update")) {
-                    for (int i = 1; i <= 12; i++) {
-                        scriptArgs.add(script.get(j + i)[0]);
-                    }
-                    j += 12;
-                } else {
-                    scriptArgs.add((script.get(j).length >= 2) ? script.get(j)[1] : null);
+            for (int j = 0; j < commandWithArgs.size(); j++) {
+                commandArgs = new ArrayList<>();
+                command = commandWithArgs.get(j)[0];
+
+                switch(command) {
+                    case "add":
+                        for (int i = 1; i <= 11; i++) {
+                            commandArgs.add(commandWithArgs.get(j + i)[0]);
+                        }
+                        j += 11;
+                        break;
+
+                    case "update":
+                        commandArgs.add(commandWithArgs.get(j)[1]);
+                        for (int i = 1; i <= 11; i++) {
+                            commandArgs.add(commandWithArgs.get(j + i)[0]);
+                        }
+                        j += 12;
+                        break;
+
+                    case "filter_contains_name":
+                    case "execute_script":
+                    case "remove_by_id":
+                        commandArgs.add(commandWithArgs.get(j)[1]);
+                        j++;
+                        break;
                 }
 
                 try {
-                    switch (scriptCommand) {
+                    switch (command) {
+                        case "max_by_expelled_students":
+                        case "remove_first":
+                        case "history":
                         case "help":
                         case "info":
                         case "show":
                         case "clear":
-                        case "max_by_expelled_students":
-                        case "remove_first":
                         case "head":
-                        case "history":
                         case "exit":
-                            this.sender.sendMessage(commandObjectCreator.create(scriptCommand, scriptArgs), this.serverAddress);
+                            this.sender.sendMessage(commandObjectCreator.create(command, commandArgs), this.serverAddress);
                             break;
 
                         case "add":
                         case "update":
                         case "remove_by_id":
                         case "filter_contains_name":
-                            assert scriptArgs != null;
-                            this.sender.sendMessage(commandObjectCreator.create(scriptCommand, scriptArgs), this.serverAddress);
+                            assert commandArgs != null;
+                            this.sender.sendMessage(commandObjectCreator.create(command, commandArgs), this.serverAddress);
                             break;
 
                         case "execute_script":
                             this.scriptIsRecursive = true;
-                            executeScript(scriptArgs.get(0));
+                            executeScript(commandArgs.get(0));
                     }
 
                     try {
@@ -107,10 +116,13 @@ public class ScriptReader {
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-                rec.clear();
             }
         } catch (FileNotFoundException ignored) {
 
         }
+    }
+
+    public void clearScriptStack() {
+        this.scriptNameStack.clear();
     }
 }
